@@ -1,0 +1,21 @@
+services:
+  backend:
+    build: ./backend
+    env_file: .env
+    environment:
+      DATABASE_PATH: /app/data/ekt_assistant.sqlite3
+      FRONTEND_ORIGIN: http://localhost:3000
+    volumes:
+      - ./data:/workspace/data:ro
+      - ./backend/data:/app/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
