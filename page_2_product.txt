@@ -1,0 +1,207 @@
+{
+  "page": 2,
+  "per_page": 20,
+  "count": 20,
+  "items": [
+    {
+      "id": 515291,
+      "name": "027228 АВ DRX250 MT 3ф 160А 18ka Legrand (1)",
+      "article": "200300285_",
+      "price": 64920,
+      "image": "https://ekt.kz/upload/iblock/47e/yow62nu665xqw3kk1es94ktbpl2z8pkt/027228_av_drx250_mt_3f_160a_18ka_legrand_1.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/silovye_avtomaticheskie_vyklyuchateli/drx250_mt_10_250_a_legrand/027228_av_drx250_mt_3f_160a_18ka_legrand_1/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=515291",
+      "offers": []
+    },
+    {
+      "id": 515288,
+      "name": "027230 АВ DRX250 MT 3ф 160А 25ka Legrand (1)",
+      "article": "200300282_",
+      "price": 65920,
+      "image": "https://ekt.kz/upload/iblock/a00/hy7g1xnr71tgeqz7m9b0olycroxt6oi2/027230_av_drx250_mt_3f_160a_25ka_legrand_1.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/silovye_avtomaticheskie_vyklyuchateli/drx250_mt_10_250_a_legrand/027230_av_drx250_mt_3f_160a_25ka_legrand_1/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=515288",
+      "offers": []
+    },
+    {
+      "id": 515277,
+      "name": "027255 АВ DRX125 MT 3ф 80А 10ka Legrand (1)",
+      "article": "200300271_",
+      "price": 29190,
+      "image": "https://ekt.kz/upload/iblock/2f4/k8wwlsiaafhwpa9m7f3ild2o7kulf9ff/027255_av_drx125_mt_3f_80a_10ka_legrand_1.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/silovye_avtomaticheskie_vyklyuchateli/drx125_mt_10_250_a_legrand/027255_av_drx125_mt_3f_80a_10ka_legrand_1/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=515277",
+      "offers": []
+    },
+    {
+      "id": 515284,
+      "name": "027257 АВ DRX125 MT 3ф 80А 20ka Legrand (1)",
+      "article": "200300278_",
+      "price": 33130,
+      "image": "https://ekt.kz/upload/iblock/203/e0iyjeljujgg0gn79ljzddvpvzdqxiy4/027257_av_drx125_mt_3f_80a_20ka_legrand_1.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/silovye_avtomaticheskie_vyklyuchateli/drx125_mt_10_250_a_legrand/027257_av_drx125_mt_3f_80a_20ka_legrand_1/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=515284",
+      "offers": []
+    },
+    {
+      "id": 19988,
+      "name": "09805 IL MX 250F 2D 21W 6500K OPPLE (1) !!!",
+      "article": "151000197_",
+      "price": 2710,
+      "image": "https://ekt.kz/upload/iblock/1cb/09805_il_mx_250f_2d_21w_6500k_opple_1_.png",
+      "url": "https://ekt.kz/catalog/svetilniki_lampy/svetilniki_dlya_vnutrennego_osveshcheniya/nakladnye_lyuministsentnye_lbo_lpo_obn/09805_il_mx_250f_2d_21w_6500k_opple_1_/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=19988",
+      "offers": []
+    },
+    {
+      "id": 25010,
+      "name": "09806 IL MX 305F 2D 38W 6500K OPPLE (1) !!!",
+      "article": "151000198_",
+      "price": 3595,
+      "image": "https://ekt.kz/upload/iblock/01a/09806_il_mx_305f_2d_38w_6500k_opple_1_.png",
+      "url": "https://ekt.kz/catalog/svetilniki_lampy/svetilniki_dlya_vnutrennego_osveshcheniya/nakladnye_lyuministsentnye_lbo_lpo_obn/09806_il_mx_305f_2d_38w_6500k_opple_1_/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=25010",
+      "offers": []
+    },
+    {
+      "id": 35604,
+      "name": "1 и 3 фазное реле контроля для насоса, 5А, 1 CO, 208...480VAC RM35BA10",
+      "article": "RM35BA10",
+      "price": 85380,
+      "image": "https://ekt.kz/upload/iblock/cfe/109gr81zevdvezq0re0ujxuwltjzof4e/1_i_3_faznoe_rele_kontrolya_dlya_nasosa_5a_1_co_208_480vac_rm35ba10.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_i_3_faznoe_rele_kontrolya_dlya_nasosa_5a_1_co_208_480vac_rm35ba10/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35604",
+      "offers": []
+    },
+    {
+      "id": 35819,
+      "name": "1-фазное реле контроля напряж, 5А, 1 CO, 20…80 V AC/DC RM17UAS16",
+      "article": "RM17UAS16",
+      "price": 49490,
+      "image": "https://ekt.kz/upload/iblock/367/b6ssh3wv4pk3rot4j9sz6fv1i0og0lym/1_faznoe_rele_kontrolya_napryazh_5a_1_co_20_80_v_ac_dc_rm17uas16.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_1_co_20_80_v_ac_dc_rm17uas16/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35819",
+      "offers": []
+    },
+    {
+      "id": 35587,
+      "name": "1-фазное реле контроля напряж, 5А, 1 CO, 20…80 V AC/DC RM17UBE16",
+      "article": "RM17UBE16",
+      "price": 67320,
+      "image": "https://ekt.kz/upload/iblock/35a/vilhxjq0z38swthf8rr8g1k2m0w3ay6f/1_faznoe_rele_kontrolya_napryazh_5a_1_co_20_80_v_ac_dc_rm17ube16.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_1_co_20_80_v_ac_dc_rm17ube16/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35587",
+      "offers": []
+    },
+    {
+      "id": 35563,
+      "name": "1-фазное реле контроля напряж, 5А, 1 CO, 65…260 V AC/DC RM17UAS15",
+      "article": "RM17UAS15",
+      "price": 43250,
+      "image": "https://ekt.kz/upload/iblock/4a6/a67mn9zqbyak4pvxxf2hk5wmd20kv4mu/1_faznoe_rele_kontrolya_napryazh_5a_1_co_65_260_v_ac_dc_rm17uas15.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_1_co_65_260_v_ac_dc_rm17uas15/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35563",
+      "offers": []
+    },
+    {
+      "id": 35574,
+      "name": "1-фазное реле контроля напряж, 5А, 1 CO, 65…260 V AC/DC RM17UBE15",
+      "article": "RM17UBE15",
+      "price": 58830,
+      "image": "https://ekt.kz/upload/iblock/c9f/393y4qbwntmep37yxuas6pqdhkkiav1t/1_faznoe_rele_kontrolya_napryazh_5a_1_co_65_260_v_ac_dc_rm17ube15.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_1_co_65_260_v_ac_dc_rm17ube15/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35574",
+      "offers": []
+    },
+    {
+      "id": 35585,
+      "name": "1-фазное реле контроля напряж, 5А, 1 CO, 9…15VDC RM17UAS14",
+      "article": "RM17UAS14",
+      "price": 47760,
+      "image": "https://ekt.kz/upload/iblock/e4a/exhtiqt3zev812fxlzjatvro6v1b78y8/1_faznoe_rele_kontrolya_napryazh_5a_1_co_9_15vdc_rm17uas14.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_1_co_9_15vdc_rm17uas14/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35585",
+      "offers": []
+    },
+    {
+      "id": 35609,
+      "name": "1-фазное реле контроля напряж, 5А, 2 CO, диапазон изм 1-100 В, питание 24-240 V AC/DC RM35UA12MW",
+      "article": "RM35UA12MW",
+      "price": 69680,
+      "image": "https://ekt.kz/upload/iblock/e8c/4fv9te3pyx6ldp44b2skwvm4zia7kgpg/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izm_1_100_v_pitanie_24_240_v_ac_dc_rm35ua12mw.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izm_1_100_v_pitanie_24_240_v_ac_dc_rm35ua12mw/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35609",
+      "offers": []
+    },
+    {
+      "id": 35608,
+      "name": "1-фазное реле контроля напряж, 5А, 2 CO, диапазон измер 0.05-5 В, питание 24-240 V AC/DC RM35UA11MW",
+      "article": "RM35UA11MW",
+      "price": 60490,
+      "image": "https://ekt.kz/upload/iblock/70a/mm19yer904nu8vo6thvz0knzd199knu3/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izmer_0_05_5_v_pitanie_24_240_v_ac_dc_rm35ua11mw.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izmer_0_05_5_v_pitanie_24_240_v_ac_dc_rm35ua11mw/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35608",
+      "offers": []
+    },
+    {
+      "id": 35610,
+      "name": "1-фазное реле контроля напряж, 5А, 2 CO, диапазон измер 15-600 В, питание 24-240 V AC/DC RM35UA13MW",
+      "article": "RM35UA13MW",
+      "price": 67270,
+      "image": "https://ekt.kz/upload/iblock/ced/hv0kuaubpnl1xqu1n9o9h6nuq8p1vlg0/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izmer_15_600_v_pitanie_24_240_v_ac_dc_rm35ua13mw.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_5a_2_co_diapazon_izmer_15_600_v_pitanie_24_240_v_ac_dc_rm35ua13mw/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35610",
+      "offers": []
+    },
+    {
+      "id": 35599,
+      "name": "1-фазное реле контроля напряж, 8 A, 2 CO, 0.05…5 V AC/DC, 24…240 V AC/DC RM22UA31MR",
+      "article": "RM22UA31MR",
+      "price": 94060,
+      "image": "https://ekt.kz/upload/iblock/196/2a0n40ypc5u0279ezm13ok4ow451nhdf/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_0_05_5_v_ac_dc_24_240_v_ac_dc_rm22ua31mr.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_0_05_5_v_ac_dc_24_240_v_ac_dc_rm22ua31mr/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35599",
+      "offers": []
+    },
+    {
+      "id": 35600,
+      "name": "1-фазное реле контроля напряж, 8 A, 2 CO, 1…100 V AC/DC, 24…240 V AC/DC RM22UA32MR",
+      "article": "RM22UA32MR",
+      "price": 39360,
+      "image": "https://ekt.kz/upload/iblock/fe5/3m9imlm19l1aqxox018i3psdsvyz19rg/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_1_100_v_ac_dc_24_240_v_ac_dc_rm22ua32mr.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_1_100_v_ac_dc_24_240_v_ac_dc_rm22ua32mr/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35600",
+      "offers": []
+    },
+    {
+      "id": 35573,
+      "name": "1-фазное реле контроля напряж, 8 A, 2 CO, 15…500 V AC/DC, 24…240 V AC/DC RM22UA33MR",
+      "article": "RM22UA33MR",
+      "price": 38370,
+      "image": "https://ekt.kz/upload/iblock/7b7/sth84evq2zriuf282g2bxv2aejgoccn5/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_15_500_v_ac_dc_24_240_v_ac_dc_rm22ua33mr.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_15_500_v_ac_dc_24_240_v_ac_dc_rm22ua33mr/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35573",
+      "offers": []
+    },
+    {
+      "id": 35601,
+      "name": "1-фазное реле контроля напряж, 8 A, 2 CO, 15…500VAC, 380…415VAC RM22UA33MT",
+      "article": "RM22UA33MT",
+      "price": 86540,
+      "image": "https://ekt.kz/upload/iblock/b37/evdxf193s8gpihd7b4b68dckbm53wcmw/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_15_500vac_380_415vac_rm22ua33mt.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_15_500vac_380_415vac_rm22ua33mt/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35601",
+      "offers": []
+    },
+    {
+      "id": 35581,
+      "name": "1-фазное реле контроля напряж, 8 A, 2 CO, 80…300 V AC/DC, 110…240 V AC/DC RM22UB34",
+      "article": "RM22UB34",
+      "price": 35730,
+      "image": "https://ekt.kz/upload/iblock/775/vqp79ajor0l5xitkj8roltd9d45r6kkf/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_80_300_v_ac_dc_110_240_v_ac_dc_rm22ub34.jpg",
+      "url": "https://ekt.kz/catalog/nizkovoltnaya_apparatura/rele_schneider_electric/1_faznoe_rele_kontrolya_napryazh_8_a_2_co_80_300_v_ac_dc_110_240_v_ac_dc_rm22ub34/",
+      "url_api_detail": "https://ekt.kz/api/products/detail?id=35581",
+      "offers": []
+    }
+  ]
+}
