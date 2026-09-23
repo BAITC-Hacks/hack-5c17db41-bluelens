@@ -48,6 +48,59 @@ def load_catalog() -> list[dict[str, Any]]:
 
 
 PRODUCTS = load_catalog()
+STORE_FILE = ROOT / "data" / "stores.json"
+STORE_DIRECTORY = json.loads(STORE_FILE.read_text(encoding="utf-8"))["stores"] if STORE_FILE.exists() else []
+STORE_TERMS = ('магазин', 'филиал', 'адрес', 'подразделение', 'шоурум')
+
+OFF_TOPIC_ANSWER = "\u042f \u043c\u043e\u0433\u0443 \u043e\u0442\u0432\u0435\u0447\u0430\u0442\u044c \u0442\u043e\u043b\u044c\u043a\u043e \u043f\u043e \u043a\u0430\u0442\u0430\u043b\u043e\u0433\u0443 ekt.kz: \u0442\u043e\u0432\u0430\u0440\u044b, \u0446\u0435\u043d\u044b, \u043d\u0430\u043b\u0438\u0447\u0438\u0435, \u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043a\u0438, \u0430\u043d\u0430\u043b\u043e\u0433\u0438, \u043c\u0430\u0433\u0430\u0437\u0438\u043d\u044b \u0438 \u0443\u0441\u043b\u043e\u0432\u0438\u044f \u043f\u043e\u043a\u0443\u043f\u043a\u0438."
+UNKNOWN_ANSWER = "\u0412 \u0437\u0430\u0433\u0440\u0443\u0436\u0435\u043d\u043d\u044b\u0445 \u0434\u0430\u043d\u043d\u044b\u0445 \u043d\u0435\u0442 \u043f\u043e\u0434\u0442\u0432\u0435\u0440\u0436\u0434\u0451\u043d\u043d\u043e\u0433\u043e \u043e\u0442\u0432\u0435\u0442\u0430 \u043d\u0430 \u044d\u0442\u043e\u0442 \u0432\u043e\u043f\u0440\u043e\u0441. \u0423\u043a\u0430\u0436\u0438\u0442\u0435 \u0430\u0440\u0442\u0438\u043a\u0443\u043b \u0438\u043b\u0438 \u043d\u0430\u0437\u0432\u0430\u043d\u0438\u0435 \u0442\u043e\u0432\u0430\u0440\u0430, \u0447\u0442\u043e\u0431\u044b \u044f \u043f\u0440\u043e\u0432\u0435\u0440\u0438\u043b \u0434\u0430\u043d\u043d\u044b\u0435."
+CATALOG_INTENTS = (
+    "\u043d\u0430\u0439\u0434\u0438", "\u043d\u0430\u0439\u0442\u0438", "\u043f\u043e\u0438\u0441\u043a", "\u043f\u043e\u043a\u0430\u0436\u0438",
+    "\u0435\u0441\u0442\u044c \u043b\u0438", "\u0446\u0435\u043d", "\u0441\u0442\u043e\u0438\u043c", "\u043d\u0430\u043b\u0438\u0447", "\u043e\u0441\u0442\u0430\u0442\u043e\u043a", "\u0441\u043a\u043b\u0430\u0434",
+    "\u0430\u043d\u0430\u043b\u043e\u0433", "\u0437\u0430\u043c\u0435\u043d", "\u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442", "\u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442",
+    "\u043c\u0430\u0433\u0430\u0437\u0438\u043d", "\u0444\u0438\u043b\u0438\u0430\u043b", "\u0430\u0434\u0440\u0435\u0441", "\u043e\u043f\u043b\u0430\u0442", "\u0434\u043e\u0441\u0442\u0430\u0432", "\u0443\u0441\u043b\u043e\u0432",
+    "\u043a\u043e\u0440\u0437\u0438\u043d", "\u0434\u043e\u0431\u0430\u0432", "\u043a\u043e\u043b\u0438\u0447\u0435\u0441\u0442\u0432", "\u0448\u0442\u0443\u043a", "\u0442\u043e\u0432\u0430\u0440", "\u0430\u0440\u0442\u0438\u043a\u0443\u043b", "\u043a\u0430\u0442\u0430\u043b\u043e\u0433", "\u0431\u0440\u0435\u043d\u0434", "\u043f\u0440\u043e\u0438\u0437\u0432\u043e\u0434\u0438\u0442\u0435\u043b",
+    "\u0430\u0432\u0442\u043e\u043c\u0430\u0442", "\u0432\u044b\u043a\u043b\u044e\u0447\u0430\u0442", "\u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043e\u0440", "\u0440\u0435\u043b\u0435", "\u0440\u043e\u0437\u0435\u0442", "\u043a\u0430\u0431\u0435\u043b", "\u043f\u0440\u043e\u0432\u043e\u0434", "\u044d\u043b\u0435\u043a\u0442\u0440\u043e",
+    "price", "stock", "availability", "product", "catalog", "article", "brand", "analogue", "analog", "store", "branch", "address", "delivery", "payment", "cart", "specification", "characteristic",
+)
+OFF_TOPIC_MARKERS = ('погод', 'президен', 'политик', 'столиц', 'рецепт', 'истори', 'перевед', 'перевод', 'сочин', 'анекдот', 'стих', 'песн', 'программ', 'weather', 'president', 'politics', 'capital', 'recipe', 'history', 'translate', 'poem', 'joke', 'bitcoin', 'crypto', 'stock market', 'почему', 'зачем', 'такой', 'такая', 'создал', 'придумал', 'починить', 'установить', 'подключить', 'работает', 'устроен', 'why', 'to', 'install', 'repair', 'does', 'кто такой', 'кто такая', 'кто создал', 'кто придумал', 'как починить', 'как установить', 'как подключить', 'как работает', 'как устроен', 'who is president', 'who invented', 'who founded', 'how to install', 'how to repair', 'how does')
+PRODUCT_CATEGORIES = ("\u0430\u0432\u0442\u043e\u043c\u0430\u0442", "\u0432\u044b\u043a\u043b\u044e\u0447\u0430\u0442", "\u043a\u043e\u043d\u0442\u0430\u043a\u0442\u043e\u0440", "\u0440\u0435\u043b\u0435", "\u0440\u043e\u0437\u0435\u0442", "\u043a\u0430\u0431\u0435\u043b", "\u043f\u0440\u043e\u0432\u043e\u0434", "\u044d\u043b\u0435\u043a\u0442\u0440\u043e", "circuit breaker", "switch", "cable", "relay")
+PRODUCT_DETAIL_INTENTS = ("\u0446\u0435\u043d", "\u0441\u0442\u043e\u0438\u043c", "\u043d\u0430\u043b\u0438\u0447", "\u043e\u0441\u0442\u0430\u0442\u043e\u043a", "\u0441\u043a\u043b\u0430\u0434", "\u0430\u043d\u0430\u043b\u043e\u0433", "\u0437\u0430\u043c\u0435\u043d", "\u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442", "\u0441\u0435\u0440\u0442\u0438\u0444\u0438\u043a\u0430\u0442")
+
+
+def has_product_reference(message: str, state: dict[str, Any] | None = None) -> bool:
+    if state and state.get("selected_id"):
+        return True
+    if re.search(r"\d{4,}", message):
+        return True
+    key = norm(message)
+    for product in PRODUCTS:
+        identifiers = (product.get("article"), product.get("brand"), product.get("name"))
+        for identifier in identifiers:
+            token = norm(identifier)
+            if token and len(token) >= 3 and token in key:
+                return True
+    return any(term in message.lower() for term in PRODUCT_CATEGORIES)
+
+
+def is_supported_request(message: str, state: dict[str, Any] | None = None) -> bool:
+    lowered = message.lower().replace("\u0451", "\u0435")
+    if any(term in lowered for term in OFF_TOPIC_MARKERS):
+        return False
+    if any(term in lowered for term in CATALOG_INTENTS):
+        return True
+    return has_product_reference(message, state)
+
+
+def request_needs_product(message: str, state: dict[str, Any] | None = None) -> bool:
+    lowered = message.lower().replace("\u0451", "\u0435")
+    if any(term in lowered for term in STORE_TERMS) or any(term in lowered for term in ("\u043e\u043f\u043b\u0430\u0442", "\u0434\u043e\u0441\u0442\u0430\u0432", "\u0443\u0441\u043b\u043e\u0432")):
+        return False
+    if has_product_reference(message, state):
+        return False
+    needs_specific_product = any(term in lowered for term in PRODUCT_DETAIL_INTENTS)
+    needs_specific_product = needs_specific_product or any(term in lowered for term in ("\u043d\u0430\u0439\u0434\u0438", "\u043d\u0430\u0439\u0442\u0438", "\u043f\u043e\u0438\u0441\u043a", "\u043f\u043e\u043a\u0430\u0436\u0438"))
+    return needs_specific_product
 BY_ID = {str(p["id"]): p for p in PRODUCTS}
 SYSTEM_PROMPT = (Path(__file__).with_name("system_prompt.txt").read_text(encoding="utf-8").strip()
                  if Path(__file__).with_name("system_prompt.txt").exists() else "Ты консультант ekt.kz. Используй только данные backend tools.")
@@ -106,6 +159,20 @@ def norm(value: Any) -> str:
 
 
 BY_ARTICLE = {norm(p.get("article")): p for p in PRODUCTS if p.get("article")}
+CITY_ALIASES = {'алматы': 'алматы', 'алмате': 'алматы', 'алмааты': 'алматы', 'алмаата': 'алматы', 'астана': 'нурсултан', 'астане': 'нурсултан', 'нурсултан': 'нурсултан', 'шымкент': 'шымкент', 'тараз': 'тараз', 'атырау': 'атырау', 'караганда': 'караганда', 'караганде': 'караганда', 'актау': 'актау'}
+
+
+def canonical_city(city: str | None) -> str:
+    key = norm(city)
+    return CITY_ALIASES.get(key, key)
+
+
+def find_city(text: str) -> str | None:
+    value = norm(text)
+    for alias in sorted(CITY_ALIASES, key=len, reverse=True):
+        if alias and alias in value:
+            return CITY_ALIASES[alias]
+    return None
 
 
 def tokens(value: str) -> list[str]:
@@ -166,8 +233,7 @@ def city_stock(product: dict[str, Any], city: str | None = None) -> dict[str, An
     stores = product.get("stores")
     if stores is None:
         return {"known": False, "quantity": None, "city": city}
-    aliases = {"алмааты": "алматы", "алмаата": "алматы", "астана": "нурсултан", "нурсултан": "нурсултан"}
-    city_key = aliases.get(norm(city), norm(city))
+    city_key = canonical_city(city)
     matches = [s for s in stores if city_key and city_key in norm(s["name"])]
     if not matches:
         return {"known": False, "quantity": None, "city": city}
@@ -315,6 +381,21 @@ def local_chat(message: str, state: dict[str, Any], session_id: str) -> tuple[st
         state.pop("pending", None)
         return "Хорошо, товар не добавлял. Если понадобится — скажите количество.", [], state
 
+    if any(term in lowered for term in STORE_TERMS) and not re.search(r"\b\d{4,}\b", text):
+        requested_city = find_city(lowered)
+        found_stores = [store for store in STORE_DIRECTORY if not requested_city or canonical_city(store.get("city")) == requested_city]
+        if found_stores:
+            store = found_stores[0]
+            phones = ", ".join(store.get("phones", [])) or "\u043d\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043e"
+            hours = "; ".join(store.get("hours", [])) or "\u043d\u0435 \u0443\u043a\u0430\u0437\u0430\u043d\u043e"
+            return f"{store['name']} \u0432 \u0433. {store['city']}.\n\u0410\u0434\u0440\u0435\u0441: {store['address']}\n\u0422\u0435\u043b\u0435\u0444\u043e\u043d: {phones}\n\u0413\u0440\u0430\u0444\u0438\u043a: {hours}." , [], state
+        if requested_city:
+            return 'В локальном справочнике нет подтверждённого адреса подразделения ekt.kz в городе ' + requested_city + '. Могу проверить остаток товара в этом городе, если напишете артикул.', [], state
+        cities = ", ".join(store["city"] for store in STORE_DIRECTORY)
+        if cities:
+            return 'В демо-справочнике есть контакты подразделения ekt.kz в городах: ' + cities + '. Для адреса другого города нужны подтверждённые данные.', [], state
+        return 'В загруженных данных нет справочника магазинов и адресов ekt.kz.', [], state
+
     qty = extract_quantity(text)
     asks_quantity = qty is not None and bool(re.search(r"(нужн|надо|хочу|добав|штук|шт\b|количеств)", lowered))
     if asks_quantity:
@@ -385,11 +466,11 @@ def local_chat(message: str, state: dict[str, Any], session_id: str) -> tuple[st
         direct = search_products(article.group(0)) or direct
     if not direct and selected:
         direct = [selected]
-    city_match = re.search(r"\b(?:в|по)\s+(алматы|алмааты|астана|нур-султан|шымкент|тараз|атырау|караганда|актау)\b", lowered)
+    city_match = find_city(lowered)
     price_question = "цен" in lowered or "сколько стоит" in lowered
     stock_question = bool(re.search(r"(есть ли|налич|в\s+алматы|в\s+шымкенте|остаток)", lowered))
     if not direct:
-        return "Не нашёл подходящего товара в загруженных данных. Попробуйте указать артикул или часть названия.", [], state
+        return UNKNOWN_ANSWER, [], state
 
     state["last_product_ids"] = [p["id"] for p in direct]
     state["selected_id"] = direct[0]["id"]
@@ -410,7 +491,7 @@ def local_chat(message: str, state: dict[str, Any], session_id: str) -> tuple[st
         return f"В загруженных данных для «{p['name']}» ссылка или файл сертификата не указаны.", cards[:1], state
     if city_match or stock_question:
         p = direct[0]
-        stock = city_stock(p, city_match.group(1) if city_match else None)
+        stock = city_stock(p, city_match)
         if stock["known"]:
             where = f" в {stock['city']}" if stock.get("city") else " по всем складам"
             answer = f"Да, «{p['name']}» ({p['article']}){where}: {stock['quantity']} шт."
@@ -455,11 +536,12 @@ def openai_tool_answer(message: str, state: dict[str, Any], session_id: str) -> 
             {"role": "user", "content": message},
         ]
         cards: list[dict[str, Any]] = []
+        grounded_results = 0
         for _ in range(4):
             response = client.chat.completions.create(model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"), messages=messages, tools=tools, tool_choice="auto")
             choice = response.choices[0].message
             if not choice.tool_calls:
-                return (choice.content or "", cards) if choice.content else None
+                return (choice.content or "", cards) if choice.content and grounded_results > 0 else None
             messages.append(choice.model_dump(exclude_none=True))
             for call in choice.tool_calls:
                 args = json.loads(call.function.arguments or "{}")
@@ -491,6 +573,20 @@ def openai_tool_answer(message: str, state: dict[str, Any], session_id: str) -> 
                         data = {"ok": False, "message": "Корзина не изменена: нет ожидающего подтверждения пользователя."}
                 else:
                     data = {"error": "Unknown tool"}
+                if name == "search_products":
+                    grounded_results += bool(data)
+                elif name == "get_product":
+                    grounded_results += data is not None
+                elif name == "get_stock":
+                    grounded_results += bool(data.get("known"))
+                elif name == "find_analogs":
+                    grounded_results += bool(data)
+                elif name == "get_cart":
+                    grounded_results += True
+                elif name == "get_purchase_conditions":
+                    grounded_results += bool(data.get("available"))
+                elif name == "add_to_cart":
+                    grounded_results += bool(data.get("ok"))
                 messages.append({"role": "tool", "tool_call_id": call.id, "content": json.dumps(data, ensure_ascii=False, default=str)})
         return None
     except Exception:
@@ -559,19 +655,30 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
     state = load_state(payload.session_id)
     answer: str
     cards: list[dict[str, Any]] = []
-    # Cart actions use a local confirmation state machine; a model cannot bypass it.
-    if state.get("pending") and (yes_intent(payload.message) or no_intent(payload.message) or extract_quantity(payload.message) is not None):
-        answer, cards, state = local_chat(payload.message, state, payload.session_id)
+    message = payload.message.strip()
+
+    # A pending cart confirmation remains local and cannot be overridden by the model.
+    if state.get("pending") and (yes_intent(message) or no_intent(message) or extract_quantity(message) is not None):
+        answer, cards, state = local_chat(message, state, payload.session_id)
+    elif not is_supported_request(message, state):
+        answer = OFF_TOPIC_ANSWER
+    elif request_needs_product(message, state):
+        answer, cards, state = UNKNOWN_ANSWER, [], state
     else:
         model_result = None
-        # Deterministic demo flows remain available offline; OpenAI tools handle open-ended requests.
-        known_intent = any(word in payload.message.lower() for word in ("найди", "покажи", "аналог", "характерист", "отключающ", "цена", "сколько стоит", "есть ли", "налич", "алматы", "штук", "шт", "оплат", "доставк", "минимальн", "условия")) or bool(re.search(r"\b\d{4,}\b", payload.message))
-        if not known_intent:
-            model_result = openai_tool_answer(payload.message, state, payload.session_id)
+        lowered = message.lower()
+        deterministic_intents = (
+            "\u043d\u0430\u0439\u0434\u0438", "\u043d\u0430\u0439\u0442\u0438", "\u043f\u043e\u0438\u0441\u043a", "\u043f\u043e\u043a\u0430\u0436\u0438",
+            "\u0430\u043d\u0430\u043b\u043e\u0433", "\u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442", "\u0446\u0435\u043d", "\u0441\u043a\u043e\u043b\u044c\u043a\u043e \u0441\u0442\u043e\u0438\u0442",
+            "\u0435\u0441\u0442\u044c \u043b\u0438", "\u043d\u0430\u043b\u0438\u0447", "\u0441\u043a\u043b\u0430\u0434", "\u0430\u0434\u0440\u0435\u0441", "\u043e\u043f\u043b\u0430\u0442", "\u0434\u043e\u0441\u0442\u0430\u0432", "\u043a\u043e\u0440\u0437\u0438\u043d", "\u0434\u043e\u0431\u0430\u0432",
+        )
+        if not any(term in lowered for term in deterministic_intents) and not re.search(r"\d{4,}", message) and not any(term in lowered for term in PRODUCT_CATEGORIES):
+            model_result = openai_tool_answer(message, state, payload.session_id)
         if model_result:
             answer, cards = model_result
         else:
-            answer, cards, state = local_chat(payload.message, state, payload.session_id)
+            answer, cards, state = local_chat(message, state, payload.session_id)
+
     save_state(payload.session_id, state)
     return {"answer": answer, "products": cards, "session_id": payload.session_id, "cart": cart_contents(payload.session_id), "pending_confirmation": state.get("pending")}
 

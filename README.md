@@ -21,6 +21,7 @@ backend/app/main.py          FastAPI API, инструменты каталог�
 backend/app/system_prompt.txt системные правила AI-консультанта
 backend/tests/               интеграционные и доменные smoke-тесты
 data/catalog.json            нормализованный локальный каталог для DEMO_MODE
+data/stores.json              Almaty EKT branch contact, source URL and verification date
 frontend/app/                Next.js интерфейс чата и корзины
 scripts/prepare_catalog.mjs  импорт исходных JSON-выгрузок проекта
 scripts/sync_catalog.py     опциональная синхронизация с API магазина
