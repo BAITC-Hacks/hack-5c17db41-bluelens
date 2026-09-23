@@ -1,4 +1,4 @@
-# hack-5c17db41-bluelens
+# hack-5c17db41-NightsWatch
 Hackathon team repository for BlueLens
 
 ================================================================================
