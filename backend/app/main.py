@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import Any
 from xml.etree import ElementTree
 
-from fastapi import FastAPI, File, HTTPException, UploadFile
+from fastapi import FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
@@ -73,13 +73,31 @@ def init_db() -> None:
                 id TEXT PRIMARY KEY, state_json TEXT NOT NULL DEFAULT '{}', updated_at TEXT DEFAULT CURRENT_TIMESTAMP
             );
             CREATE TABLE IF NOT EXISTS cart_items (
-                product_id TEXT PRIMARY KEY, quantity INTEGER NOT NULL CHECK(quantity > 0), updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                session_id TEXT NOT NULL, product_id TEXT NOT NULL,
+                quantity INTEGER NOT NULL CHECK(quantity > 0), updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY(session_id, product_id)
             );
             CREATE TABLE IF NOT EXISTS cart_actions (
-                id INTEGER PRIMARY KEY AUTOINCREMENT, product_id TEXT NOT NULL, quantity INTEGER NOT NULL,
+                id INTEGER PRIMARY KEY AUTOINCREMENT, session_id TEXT NOT NULL,
+                product_id TEXT NOT NULL, quantity INTEGER NOT NULL,
                 confirmed INTEGER NOT NULL, created_at TEXT DEFAULT CURRENT_TIMESTAMP
             );
         """)
+        cart_columns = {row[1] for row in con.execute("PRAGMA table_info(cart_items)")}
+        if "session_id" not in cart_columns:
+            # Keep the former shared demo cart separate so no visitor inherits it.
+            con.execute("ALTER TABLE cart_items RENAME TO cart_items_legacy_global")
+            con.execute("""CREATE TABLE cart_items (
+                session_id TEXT NOT NULL, product_id TEXT NOT NULL,
+                quantity INTEGER NOT NULL CHECK(quantity > 0), updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY(session_id, product_id)
+            )""")
+            con.execute("""INSERT INTO cart_items(session_id,product_id,quantity,updated_at)
+                SELECT 'legacy-import',product_id,quantity,updated_at FROM cart_items_legacy_global""")
+            con.execute("DROP TABLE cart_items_legacy_global")
+        action_columns = {row[1] for row in con.execute("PRAGMA table_info(cart_actions)")}
+        if "session_id" not in action_columns:
+            con.execute("ALTER TABLE cart_actions ADD COLUMN session_id TEXT NOT NULL DEFAULT 'legacy-import'")
 
 
 def norm(value: Any) -> str:
@@ -198,6 +216,7 @@ class ChatRequest(BaseModel):
 
 
 class CartRequest(BaseModel):
+    session_id: str = Field(min_length=4, max_length=100)
     product_id: str
     quantity: int = Field(gt=0, le=10000)
     confirmed: bool = False
@@ -214,9 +233,9 @@ def save_state(session_id: str, state: dict[str, Any]) -> None:
         con.execute("INSERT INTO sessions(id,state_json,updated_at) VALUES(?,?,CURRENT_TIMESTAMP) ON CONFLICT(id) DO UPDATE SET state_json=excluded.state_json,updated_at=CURRENT_TIMESTAMP", (session_id, json.dumps(state, ensure_ascii=False)))
 
 
-def cart_contents() -> dict[str, Any]:
+def cart_contents(session_id: str) -> dict[str, Any]:
     with db() as con:
-        rows = con.execute("SELECT product_id,quantity FROM cart_items ORDER BY updated_at DESC").fetchall()
+        rows = con.execute("SELECT product_id,quantity FROM cart_items WHERE session_id=? ORDER BY updated_at DESC", (session_id,)).fetchall()
     items, total = [], 0
     for row in rows:
         p = get_product(row["product_id"])
@@ -228,7 +247,7 @@ def cart_contents() -> dict[str, Any]:
     return {"items": items, "total": total}
 
 
-def add_to_cart(product_id: str, quantity: int, confirmed: bool) -> dict[str, Any]:
+def add_to_cart(session_id: str, product_id: str, quantity: int, confirmed: bool) -> dict[str, Any]:
     # Repeat catalog/availability validation immediately before the cart write.
     product = get_product(product_id)
     if not product:
@@ -242,14 +261,14 @@ def add_to_cart(product_id: str, quantity: int, confirmed: bool) -> dict[str, An
         raise HTTPException(409, "Актуальный остаток этого товара неизвестен. Добавление отменено.")
     with db() as con:
         con.execute("BEGIN IMMEDIATE")
-        existing = con.execute("SELECT quantity FROM cart_items WHERE product_id=?", (product["id"],)).fetchone()
+        existing = con.execute("SELECT quantity FROM cart_items WHERE session_id=? AND product_id=?", (session_id, product["id"])).fetchone()
         already_in_cart = int(existing[0]) if existing else 0
         available = max(0, int(current) - already_in_cart)
         if quantity > available:
             raise HTTPException(409, f"Доступно только {available} шт.")
-        con.execute("INSERT INTO cart_items(product_id,quantity) VALUES(?,?) ON CONFLICT(product_id) DO UPDATE SET quantity=quantity+excluded.quantity,updated_at=CURRENT_TIMESTAMP", (product["id"], quantity))
-        con.execute("INSERT INTO cart_actions(product_id,quantity,confirmed) VALUES(?,?,1)", (product["id"], quantity))
-    return {"ok": True, "product": product, "quantity_added": quantity, "cart": cart_contents()}
+        con.execute("INSERT INTO cart_items(session_id,product_id,quantity) VALUES(?,?,?) ON CONFLICT(session_id,product_id) DO UPDATE SET quantity=quantity+excluded.quantity,updated_at=CURRENT_TIMESTAMP", (session_id, product["id"], quantity))
+        con.execute("INSERT INTO cart_actions(session_id,product_id,quantity,confirmed) VALUES(?,?,?,1)", (session_id, product["id"], quantity))
+    return {"ok": True, "product": product, "quantity_added": quantity, "cart": cart_contents(session_id)}
 
 
 def extract_quantity(message: str) -> int | None:
@@ -273,7 +292,7 @@ def price_text(price: int | None) -> str:
     return f"{int(price):,}".replace(",", " ") + " ₸" if price is not None else "цена не указана"
 
 
-def local_chat(message: str, state: dict[str, Any]) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
+def local_chat(message: str, state: dict[str, Any], session_id: str) -> tuple[str, list[dict[str, Any]], dict[str, Any]]:
     text = message.strip()
     lowered = text.lower().replace("ё", "е")
     cards: list[dict[str, Any]] = []
@@ -284,7 +303,7 @@ def local_chat(message: str, state: dict[str, Any]) -> tuple[str, list[dict[str,
         p = get_product(str(pending["product_id"]))
         quantity = int(pending["quantity"])
         try:
-            result = add_to_cart(str(pending["product_id"]), quantity, confirmed=True)
+            result = add_to_cart(session_id, str(pending["product_id"]), quantity, confirmed=True)
             state.pop("pending", None)
             state["selected_id"] = p["id"]
             return f"Готово, добавил {quantity} шт. «{p['name']}» в корзину. Можно перейти в корзину.", [product_card(p)], state | {"cart": result["cart"]}
@@ -310,7 +329,7 @@ def local_chat(message: str, state: dict[str, Any]) -> tuple[str, list[dict[str,
         if stock is None:
             return f"Для «{requested_product['name']}» в демо-каталоге остаток не указан, поэтому я не могу подтвердить количество для корзины.", [product_card(requested_product)], state
         with db() as con:
-            in_cart_row = con.execute("SELECT quantity FROM cart_items WHERE product_id=?", (requested_product["id"],)).fetchone()
+            in_cart_row = con.execute("SELECT quantity FROM cart_items WHERE session_id=? AND product_id=?", (session_id, requested_product["id"])).fetchone()
         available = max(0, int(stock) - (int(in_cart_row[0]) if in_cart_row else 0))
         if available < 1:
             return "Сейчас доступного остатка нет, добавить товар нельзя.", [product_card(requested_product)], state
@@ -460,13 +479,13 @@ def openai_tool_answer(message: str, state: dict[str, Any], session_id: str) -> 
                     data = [{"product": product_card(x), "comparison": compare_analog(p, x)} for x in analogs(p)] if p else []
                     cards.extend(row["product"] for row in data)
                 elif name == "get_cart":
-                    data = cart_contents()
+                    data = cart_contents(session_id)
                 elif name == "get_purchase_conditions":
                     data = get_purchase_conditions()
                 elif name == "add_to_cart":
                     pending = state.get("pending")
                     if yes_intent(message) and pending and str(pending.get("product_id")) == str(args.get("product_id")) and int(pending.get("quantity", 0)) == int(args.get("quantity", 0)):
-                        data = add_to_cart(str(args["product_id"]), int(args["quantity"]), True)
+                        data = add_to_cart(session_id, str(args["product_id"]), int(args["quantity"]), True)
                         state.pop("pending", None)
                     else:
                         data = {"ok": False, "message": "Корзина не изменена: нет ожидающего подтверждения пользователя."}
@@ -521,8 +540,8 @@ def api_analogs(product_id: str) -> dict[str, Any]:
 
 
 @app.get("/api/cart")
-def api_cart() -> dict[str, Any]:
-    return cart_contents()
+def api_cart(session_id: str = Query(min_length=4, max_length=100)) -> dict[str, Any]:
+    return cart_contents(session_id)
 
 
 @app.get("/api/purchase-conditions")
@@ -532,7 +551,7 @@ def api_purchase_conditions() -> dict[str, Any]:
 
 @app.post("/api/cart/add")
 def api_cart_add(payload: CartRequest) -> dict[str, Any]:
-    return add_to_cart(payload.product_id, payload.quantity, payload.confirmed)
+    return add_to_cart(payload.session_id, payload.product_id, payload.quantity, payload.confirmed)
 
 
 @app.post("/api/chat")
@@ -542,7 +561,7 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
     cards: list[dict[str, Any]] = []
     # Cart actions use a local confirmation state machine; a model cannot bypass it.
     if state.get("pending") and (yes_intent(payload.message) or no_intent(payload.message) or extract_quantity(payload.message) is not None):
-        answer, cards, state = local_chat(payload.message, state)
+        answer, cards, state = local_chat(payload.message, state, payload.session_id)
     else:
         model_result = None
         # Deterministic demo flows remain available offline; OpenAI tools handle open-ended requests.
@@ -552,9 +571,9 @@ def chat(payload: ChatRequest) -> dict[str, Any]:
         if model_result:
             answer, cards = model_result
         else:
-            answer, cards, state = local_chat(payload.message, state)
+            answer, cards, state = local_chat(payload.message, state, payload.session_id)
     save_state(payload.session_id, state)
-    return {"answer": answer, "products": cards, "session_id": payload.session_id, "cart": cart_contents(), "pending_confirmation": state.get("pending")}
+    return {"answer": answer, "products": cards, "session_id": payload.session_id, "cart": cart_contents(payload.session_id), "pending_confirmation": state.get("pending")}
 
 
 def extract_docx(data: bytes) -> str:

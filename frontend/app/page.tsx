@@ -1,6 +1,7 @@
 'use client';
 
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
+import { getSessionId } from '../lib/session';
 
 const API = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 const SUGGESTIONS = ['Найди Legrand', 'Есть ли 027228?', 'Есть ли 027228 в Алматы?', 'Покажи аналоги', 'Покажи характеристики'];
@@ -59,17 +60,17 @@ export default function Home() {
   const uploadRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    let id = localStorage.getItem('ekt-session-id');
-    if (!id) { id = globalThis.crypto?.randomUUID?.() || `session-${Date.now()}`; localStorage.setItem('ekt-session-id', id); }
+    const id = getSessionId();
     setSessionId(id);
     void fetch(`${API}/api/health`).then((r) => setApiOnline(r.ok)).catch(() => setApiOnline(false));
-    void fetchCart();
+    void fetchCart(id);
   }, []);
 
   useEffect(() => { feedRef.current?.scrollTo({ top: feedRef.current.scrollHeight, behavior: 'smooth' }); }, [messages, loading]);
 
-  async function fetchCart() {
-    try { const response = await fetch(`${API}/api/cart`); if (response.ok) setCart(await response.json()); } catch { /* Backend may still be starting. */ }
+  async function fetchCart(id: string) {
+    if (!id) return;
+    try { const response = await fetch(`${API}/api/cart?session_id=${encodeURIComponent(id)}`); if (response.ok) setCart(await response.json()); } catch { /* Backend may still be starting. */ }
   }
 
   async function sendMessage(raw: string) {
@@ -106,7 +107,7 @@ export default function Home() {
     if (!confirmation || cartBusy) return;
     setCartBusy(true);
     try {
-      const response = await fetch(`${API}/api/cart/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ product_id: confirmation.product.id, quantity: confirmation.quantity, confirmed: true }) });
+      const response = await fetch(`${API}/api/cart/add`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ session_id: sessionId, product_id: confirmation.product.id, quantity: confirmation.quantity, confirmed: true }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.detail || 'Не удалось добавить товар');
       setCart(result.cart); setConfirmation(null);

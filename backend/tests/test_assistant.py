@@ -1,7 +1,9 @@
 import os
 import io
 import glob
+import sqlite3
 import tempfile
+from pathlib import Path
 import unittest
 
 _tmp = tempfile.NamedTemporaryFile(suffix=".sqlite3", delete=False)
@@ -23,6 +25,9 @@ class AssistantTests(unittest.TestCase):
             con.execute("DELETE FROM cart_items")
             con.execute("DELETE FROM cart_actions")
             con.execute("DELETE FROM sessions")
+
+    def cart(self, session_id):
+        return self.client.get("/api/cart", params={"session_id": session_id})
 
     def test_article_lookup_and_exact_price(self):
         product = assistant.search_products("027228")[0]
@@ -47,7 +52,7 @@ class AssistantTests(unittest.TestCase):
         self.client.post("/api/chat", json={"session_id": session, "message": "Есть ли 027228?"})
         proposal = self.client.post("/api/chat", json={"session_id": session, "message": "Мне нужно 3 штуки"}).json()
         self.assertIn("Добавить 3", proposal["answer"])
-        self.assertEqual(self.client.get("/api/cart").json()["items"], [])
+        self.assertEqual(self.cart(session).json()["items"], [])
         result = self.client.post("/api/chat", json={"session_id": session, "message": "Да, добавь"}).json()
         self.assertIn("добавил 3", result["answer"])
         self.assertEqual(result["cart"]["items"][0]["quantity"], 3)
@@ -57,14 +62,51 @@ class AssistantTests(unittest.TestCase):
         self.client.post("/api/chat", json={"session_id": session, "message": "Есть ли 027228?"})
         result = self.client.post("/api/chat", json={"session_id": session, "message": "Добавь 100 штук"}).json()
         self.assertIn("В наличии только 23 шт.", result["answer"])
-        self.assertEqual(self.client.get("/api/cart").json()["items"], [])
+        self.assertEqual(self.cart(session).json()["items"], [])
 
     def test_cart_rejects_unconfirmed_excess_and_unknown(self):
-        self.assertEqual(self.client.post("/api/cart/add", json={"product_id": "515291", "quantity": 1}).status_code, 409)
-        self.assertEqual(self.client.post("/api/cart/add", json={"product_id": "515291", "quantity": 24, "confirmed": True}).status_code, 409)
-        self.assertEqual(self.client.post("/api/cart/add", json={"product_id": "not-a-product", "quantity": 1, "confirmed": True}).status_code, 404)
+        self.assertEqual(self.client.post("/api/cart/add", json={"session_id": "safety-check", "product_id": "515291", "quantity": 1}).status_code, 409)
+        self.assertEqual(self.client.post("/api/cart/add", json={"session_id": "safety-check", "product_id": "515291", "quantity": 24, "confirmed": True}).status_code, 409)
+        self.assertEqual(self.client.post("/api/cart/add", json={"session_id": "safety-check", "product_id": "not-a-product", "quantity": 1, "confirmed": True}).status_code, 404)
         unknown_stock = assistant.get_product("515279")["stock"]
         self.assertIsNone(unknown_stock)
+
+    def test_carts_are_isolated_by_visitor_session(self):
+        added = self.client.post("/api/cart/add", json={"session_id": "shopper-one", "product_id": "027228", "quantity": 2, "confirmed": True})
+        self.assertEqual(added.status_code, 200)
+        self.assertEqual(self.cart("shopper-one").json()["items"][0]["quantity"], 2)
+        self.assertEqual(self.cart("shopper-two").json()["items"], [])
+        self.assertEqual(self.client.get("/api/cart").status_code, 422)
+
+    def test_legacy_global_cart_is_migrated_out_of_visitor_carts(self):
+        with tempfile.TemporaryDirectory() as directory:
+            legacy_path = Path(directory) / "legacy.sqlite3"
+            con = sqlite3.connect(legacy_path)
+            try:
+                con.executescript("""
+                    CREATE TABLE cart_items (
+                        product_id TEXT PRIMARY KEY, quantity INTEGER NOT NULL,
+                        updated_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    );
+                    CREATE TABLE cart_actions (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT, product_id TEXT NOT NULL,
+                        quantity INTEGER NOT NULL, confirmed INTEGER NOT NULL,
+                        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+                    );
+                    INSERT INTO cart_items(product_id,quantity) VALUES('027228',2);
+                """)
+            finally:
+                con.close()
+            previous_path = assistant.DB_FILE
+            try:
+                assistant.DB_FILE = legacy_path
+                assistant.init_db()
+                self.assertEqual(assistant.cart_contents("legacy-import")["items"][0]["quantity"], 2)
+                self.assertEqual(assistant.cart_contents("new-shopper")["items"], [])
+                with assistant.db() as con:
+                    self.assertIn("session_id", {row[1] for row in con.execute("PRAGMA table_info(cart_actions)")})
+            finally:
+                assistant.DB_FILE = previous_path
 
     def test_http_api_and_file_upload(self):
         self.assertTrue(self.client.get("/api/health").json()["ok"])
@@ -82,12 +124,12 @@ class AssistantTests(unittest.TestCase):
         self.assertIn("160", replies[3]["answer"])
         self.assertIn("Совпадает", replies[4]["answer"])
         self.assertIn("Добавить 3", replies[5]["answer"])
-        self.assertEqual(self.client.get("/api/cart").json()["items"], [])
+        self.assertEqual(self.cart(session).json()["items"], [])
         added = self.client.post("/api/chat", json={"session_id": session, "message": "Да, добавь"}).json()
         self.assertEqual(added["cart"]["items"][0]["quantity"], 3)
         too_many = self.client.post("/api/chat", json={"session_id": session, "message": "Добавь 100 штук"}).json()
         self.assertIn("В наличии только 20 шт.", too_many["answer"])
-        self.assertEqual(self.client.get("/api/cart").json()["items"][0]["quantity"], 3)
+        self.assertEqual(self.cart(session).json()["items"][0]["quantity"], 3)
 
     def test_xlsx_docx_and_image_upload(self):
         from openpyxl import Workbook
