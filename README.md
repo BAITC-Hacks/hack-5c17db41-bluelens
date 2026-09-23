@@ -113,7 +113,7 @@ DATABASE_URL=postgresql://user:password@localhost:5432/ekt_catalog
 OPENAI_API_KEY=your_openai_api_key_here
 VECTOR_DB_URL=http://localhost:6333
 
-Шаг 3: Запуск через Docker Compose
+Шаг 3: Запуск через Docker compose
 docker-compose up --build -d
 
 Шаг 4: Загрузка тестового каталога
